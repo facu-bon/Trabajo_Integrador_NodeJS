@@ -16,7 +16,7 @@ app.use(express.json());
 app.use('/api/chats', chatsRouter)
 app.use('/api/messages', messagesRouter)
 app.use('/api/auth', authRouter)
-app.get("/", authorizationMiddleware, (req, res) => {
+app.get("/test", authorizationMiddleware, (req, res) => {
   res.json(
     {
       ok: true,
