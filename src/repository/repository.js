@@ -55,6 +55,14 @@ export async function createChat(user_id_1, user_id_2) {
     throw error;
   }
 }
+export async function buscarChatPorId(id) {
+  try {
+    const chat = await chatModel.findById(id);
+    return chat;
+  } catch (error) {
+    console.log("Error al buscar el chat por id", error);
+  }
+}
 
 export async function getMessagesByChatId(chatId) {
   try {
