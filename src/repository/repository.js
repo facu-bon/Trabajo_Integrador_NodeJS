@@ -91,3 +91,72 @@ export async function buscarUsuarioPorId(id) {
   const user = await userModel.findById(id);
   return user;
 }
+
+export async function detailUser(req, res) {
+	const { userId } = req.params;
+	const user = await buscarUsuarioPorId(userId);
+	if (!user) {
+		return res.status(404).json({
+			ok: false,
+			status: 404,
+			message: 'Usuario no encontrado',
+		});
+	}
+	return res.status(200).json({
+		ok: true,
+		status: 200,
+		message: 'Usuario obtenido correctamente',
+		data: {
+			user
+		}
+	});
+}
+
+
+export async function listUsers(req, res) {
+	const users = await userModel.find({});
+	if (!users) {
+		return res.status(404).json({
+			ok: false,
+			status: 404,
+			message: 'No hay usuarios registrados',
+		});
+	}
+	return res.status(200).json({
+		ok: true,
+		status: 200,
+		message: 'Usuarios obtenidos correctamente',
+		data: {
+			users: users.map(user => user.email)
+		}
+	});
+}
+
+
+export async function deleteUser(req, res) {
+	const { userId } = req.params;
+	try {
+		const user = await buscarUsuarioPorId(userId);
+		if (!user) {
+			return res.status(404).json({
+				ok: false,
+				status: 404,
+				message: 'Usuario no encontrado',
+			});
+		}
+		await userModel.findByIdAndDelete(userId);
+		return res.status(200).json({
+			ok: true,
+			status: 200,
+			message: 'Usuario eliminado correctamente',
+		});
+	} catch (error) {
+		return res.status(500).json({
+			ok: false,
+			status: 500,
+			message: 'Error al eliminar el usuario',
+			error: error.message
+		});
+	}
+
+}
