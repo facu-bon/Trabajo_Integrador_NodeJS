@@ -1,5 +1,6 @@
 import express from "express";
-import { createMessage, getMessages, updateMessage, deleteMessage } from "../repository/repository.js";
+import { createMessage, getMessages, updateMessage, deleteMessage, buscarUsuarioPorId } from "../repository/repository.js";
+import { messageMiddleware } from "../middlewares/messageMiddleware.js";
 
 const messagesRouter = express.Router();
 
@@ -18,11 +19,10 @@ messagesRouter.get("/",
     )
   }
 );
-messagesRouter.post('/:chatId',
+messagesRouter.post('/:chatId', messageMiddleware,
   async (req, res) => {
     try {
-      const { content, sender } = req.body;
-      const { chatId } = req.params;
+      const { content, sender, chatId } = req.body;
       const newMessage = await createMessage(content, sender, chatId);
       res.json(
         {

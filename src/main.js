@@ -6,7 +6,6 @@ import messagesRouter from "./routes/messages.route.js";
 import authRouter from "./routes/auth.route.js";
 import authorizationMiddleware from "./middlewares/authorizationMiddleware.js";
 
-
 connectDB();
 
 const app = express();
