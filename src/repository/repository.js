@@ -46,9 +46,9 @@ export async function deleteMessage(id) {
 }
 
 //Chats
-export async function createChat(name, members) {
+export async function createChat(user_id_1, user_id_2) {
   try {
-    const newChat = await chatModel.create({ name, members });
+    const newChat = await chatModel.create({ user_id_1, user_id_2 });
     return newChat;
   } catch (error) {
     console.error("Error al crear el chat", error.message);
