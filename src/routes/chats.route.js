@@ -1,6 +1,6 @@
 import express from "express"
 import { createChat, deleteMessagesbychatId, getMessagesByChatId } from "../repository/repository.js";
-import { chatModel } from "../models/chat.model.js";
+
 
 const chatsRouter = express.Router();
 
