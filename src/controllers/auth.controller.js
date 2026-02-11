@@ -63,7 +63,8 @@ export async function loginUser(req, res) {
 		status: 200,
 		message: 'Login exitoso',
 		data: {
-			authToken
+			authToken,
+			userId: user_found._id
 		}
 	});
 
