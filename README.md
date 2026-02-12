@@ -178,6 +178,28 @@ https://trabajo-integrador-node-js.vercel.app/api
   }
   ```
 
+#### Listar Todos los Chats
+- **Endpoint:** `GET /chats/`
+- **Descripción:** Obtiene la lista de todos los chats
+- **Response (200):**
+  ```json
+  {
+    "ok": true,
+    "status": 200,
+    "message": "Chats obtenidos correctamente",
+    "data": {
+      "chats": [
+        {
+          "_id": "507f1f77bcf86cd799439020",
+          "user_id_1": "507f1f77bcf86cd799439011",
+          "user_id_2": "507f1f77bcf86cd799439012",
+          "createdAt": "2024-01-15T10:30:00.000Z"
+        }
+      ]
+    }
+  }
+  ```
+
 #### Obtener Mensajes de un Chat
 - **Endpoint:** `GET /chats/:chatId`
 - **Descripción:** Obtiene todos los mensajes de un chat específico
