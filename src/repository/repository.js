@@ -133,6 +133,7 @@ export async function detailUser(req, res) {
 		message: 'Usuario obtenido correctamente',
 		data: {
 			user
+      
 		}
 	});
 }
@@ -152,7 +153,7 @@ export async function listUsers(req, res) {
 		status: 200,
 		message: 'Usuarios obtenidos correctamente',
 		data: {
-			users: users.map(user => user.email)
+			users: users.map(user => ({ email: user.email, id: user._id }))
 		}
 	});
 }
