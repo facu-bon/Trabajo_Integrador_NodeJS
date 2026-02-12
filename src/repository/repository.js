@@ -58,6 +58,20 @@ export async function createChat(user_id_1, user_id_2) {
     throw error;
   }
 }
+
+//obtener todos los chats 
+export async function getChats() {
+  try {
+    const chats = await chatModel.find();
+    if (!chats || chats.length === 0) {
+      return "No hay chats registrados";
+    }
+    return chats;
+  } catch (error) {
+    console.log("Error al obtener los chats", error);
+  }
+}
+
 export async function buscarChatPorId(id) {
   try {
     const chat = await chatModel.findById(id);

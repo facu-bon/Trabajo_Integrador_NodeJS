@@ -58,6 +58,32 @@ chatsRouter.delete(
     }
   }
 )
+//obtener todo los chats
+chatsRouter.get(
+  '/',
+  async (req, res) => {
+    try {
+      const chats = await getChats();
+      res.json(
+        {
+          ok: true,
+          status: 200,
+          message: 'Chats obtenidos correctamente',
+          data: {
+            chats
+          }
+        }
+      )
+    } catch (error) {
+      res.status(400).json({
+        ok: false,
+        status: 400,
+        message: 'Error al obtener los chats',
+        error: error.message
+      })
+    }
+  }
+)
 
 chatsRouter.get(
   '/:chatid',
