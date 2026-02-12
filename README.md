@@ -7,11 +7,9 @@ API REST desarrollada con Node.js, Express y MongoDB para un sistema de mensajer
 - [Ambiente de Producción](#ambiente-de-producción-vercel)
 - [Descripción de Endpoints](#descripción-de-endpoints)
 - [Ejemplos de Requests y Responses](#ejemplos-de-requests-y-responses)
-- [Conexión con Frontend](#conexión-con-frontend)
 - [Despliegue en Vercel](#despliegue-en-vercel)
 - [Variables de Entorno](#variables-de-entorno)
 - [Tecnologías Utilizadas](#tecnologías-utilizadas)
-- [Notas Importantes](#notas-importantes)
 
 ---
 
@@ -19,7 +17,7 @@ API REST desarrollada con Node.js, Express y MongoDB para un sistema de mensajer
 
 El proyecto está desplegado en Vercel y accessible en:
 
-**URL Base:**
+**URL Base de la API:**
 ```
 https://trabajo-integrador-node-js.vercel.app/api
 ```
@@ -29,7 +27,6 @@ https://trabajo-integrador-node-js.vercel.app/api
 https://vercel.com/facu-bons-projects/trabajo-integrador-node-js
 ```
 
----
 
 ## 📡 Descripción de Endpoints
 
@@ -352,7 +349,7 @@ https://trabajo-integrador-node-js.vercel.app/api
 
 ## 💬 Ejemplos de Requests y Responses
 
-### Flujo Completo de Ejemplo
+
 
 #### 1. Registrar un usuario
 
@@ -421,298 +418,6 @@ curl -X GET https://trabajo-integrador-node-js.vercel.app/api/chats/65a5e800c123
 
 ---
 
-## 🌐 Conexión con Frontend
-
-### Configuración Base de la API
-
-Crear un archivo de configuración para las llamadas a la API:
-
-**archivo: `src/services/api.js` (ejemplo para React)**
-
-```javascript
-const API_BASE_URL = 'https://trabajo-integrador-node-js.vercel.app/api';
-
-// Función para obtener el token del localStorage
-const getToken = () => {
-  return localStorage.getItem('authToken');
-};
-
-// Función auxiliar para hacer requests
-async function makeRequest(endpoint, method = 'GET', body = null) {
-  const headers = {
-    'Content-Type': 'application/json',
-  };
-
-  // Agregar token si existe
-  const token = getToken();
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  const config = {
-    method,
-    headers,
-  };
-
-  if (body) {
-    config.body = JSON.stringify(body);
-  }
-
-  try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.message || 'Error en la solicitud');
-    }
-    
-    return data;
-  } catch (error) {
-    console.error('Error:', error);
-    throw error;
-  }
-}
-
-// Exportar funciones de la API
-export const authAPI = {
-  register: (email, password) => 
-    makeRequest('/auth/register', 'POST', { email, password }),
-  
-  login: (email, password) => 
-    makeRequest('/auth/login', 'POST', { email, password }),
-};
-
-export const usersAPI = {
-  listUsers: () => makeRequest('/users'),
-  
-  getUserDetail: (userId) => makeRequest(`/users/${userId}`),
-  
-  deleteUser: (userId) => makeRequest(`/users/${userId}`, 'DELETE'),
-};
-
-export const chatsAPI = {
-  createChat: (user_id_1, user_id_2) => 
-    makeRequest('/chats', 'POST', { user_id_1, user_id_2 }),
-  
-  getMessages: (chatId) => makeRequest(`/chats/${chatId}`),
-  
-  deleteChat: (chatId) => makeRequest(`/chats/${chatId}`, 'DELETE'),
-};
-
-export const messagesAPI = {
-  getAllMessages: () => makeRequest('/messages'),
-  
-  createMessage: (chatId, content, sender) => 
-    makeRequest(`/messages/${chatId}`, 'POST', { content, sender, chatId }),
-  
-  updateMessage: (messageId, content) => 
-    makeRequest(`/messages/${messageId}`, 'PUT', { content }),
-  
-  deleteMessage: (messageId) => 
-    makeRequest(`/messages/${messageId}`, 'DELETE'),
-};
-```
-
----
-
-### Ejemplo de Uso en un Componente React
-
-**archivo: `src/components/LoginComponent.jsx`**
-
-```javascript
-import { useState } from 'react';
-import { authAPI } from '../services/api';
-
-export function LoginComponent() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      const response = await authAPI.login(email, password);
-      
-      // Guardar token en localStorage
-      localStorage.setItem('authToken', response.data.authToken);
-      localStorage.setItem('userId', response.data.userId);
-      
-      console.log('Login exitoso:', response.data);
-      // Redirigir a la página principal
-      // navigate('/chats');
-    } catch (err) {
-      setError(err.message || 'Error al iniciar sesión');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleLogin}>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-        required
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Contraseña"
-        required
-      />
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <button type="submit" disabled={loading}>
-        {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
-      </button>
-    </form>
-  );
-}
-```
-
----
-
-### Ejemplo de Consumo de Chats y Mensajes
-
-**archivo: `src/components/ChatComponent.jsx`**
-
-```javascript
-import { useState, useEffect } from 'react';
-import { chatsAPI, messagesAPI } from '../services/api';
-
-export function ChatComponent({ chatId }) {
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  // Obtener mensajes al cargar el componente
-  useEffect(() => {
-    loadMessages();
-  }, [chatId]);
-
-  const loadMessages = async () => {
-    try {
-      const response = await chatsAPI.getMessages(chatId);
-      setMessages(response.data.messages || []);
-    } catch (error) {
-      console.error('Error al cargar mensajes:', error);
-    }
-  };
-
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!newMessage.trim()) return;
-
-    setLoading(true);
-    try {
-      const userId = localStorage.getItem('userId');
-      const response = await messagesAPI.createMessage(
-        chatId,
-        newMessage,
-        userId
-      );
-      
-      // Agregar el nuevo mensaje a la lista
-      setMessages([...messages, response.data.newMessage]);
-      setNewMessage('');
-    } catch (error) {
-      console.error('Error al enviar mensaje:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div>
-      <div style={{ maxHeight: '400px', overflowY: 'auto', border: '1px solid #ccc', padding: '10px' }}>
-        {messages.map((msg) => (
-          <div key={msg._id} style={{ marginBottom: '10px' }}>
-            <strong>{msg.sender}:</strong> {msg.content}
-            <small> ({new Date(msg.createdAt).toLocaleTimeString()})</small>
-          </div>
-        ))}
-      </div>
-
-      <form onSubmit={handleSendMessage} style={{ marginTop: '10px' }}>
-        <textarea
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Escribe un mensaje..."
-          rows="3"
-          style={{ width: '100%' }}
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? 'Enviando...' : 'Enviar'}
-        </button>
-      </form>
-    </div>
-  );
-}
-```
-
----
-
-### Usar Axios (Alternativa)
-
-Si prefires usar `axios` en lugar de fetch:
-
-```bash
-npm install axios
-```
-
-**archivo: `src/services/axiosClient.js`**
-
-```javascript
-import axios from 'axios';
-
-const API_BASE_URL = 'https://trabajo-integrador-node-js.vercel.app/api';
-
-const axiosClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Interceptor para agregar el token en cada solicitud
-axiosClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-export default axiosClient;
-```
-
-**Uso:**
-```javascript
-import axiosClient from '../services/axiosClient';
-
-// Login
-const login = async (email, password) => {
-  const response = await axiosClient.post('/auth/login', { email, password });
-  return response.data;
-};
-
-// Obtener chats
-const getChat = async (chatId) => {
-  const response = await axiosClient.get(`/chats/${chatId}`);
-  return response.data;
-};
-```
-
----
 
 ## � Despliegue en Vercel
 
@@ -740,21 +445,6 @@ const getChat = async (chatId) => {
 https://trabajo-integrador-node-js.vercel.app
 ```
 
-### Testing en Producción
-
-Una vez desplegado, prueba los endpoints con:
-
-```bash
-# Test del servidor
-curl https://trabajo-integrador-node-js.vercel.app/test
-
-# Login
-curl -X POST https://trabajo-integrador-node-js.vercel.app/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"usuario@example.com","password":"password123"}'
-```
-
----
 
 ## 📝 Variables de Entorno
 
@@ -780,22 +470,3 @@ JWT_SECRET=tu_secreto_muy_seguro_y_largo_aqui
 - **JWT**: Autenticación con tokens
 - **bcrypt**: Encriptación de contraseñas
 - **dotenv**: Gestión de variables de entorno
-
----
-
-
-## 🤝 Notas Importantes
-
-- **Autenticación**: La mayoría de los endpoints requieren autenticación con JWT en el header `Authorization: Bearer <token>`
-- **CORS**: Si usas un frontend en un dominio diferente, asegúrate de configurar CORS en Express
-- **Validación**: Implementa validación adicional en el frontend para inputs de usuarios
-- **Errores**: Todos los endpoints devuelven un objeto con propiedades `ok`, `status`, `message` y `data`
-
----
-
-## 📞 Soporte
-
-Para preguntas o problemas, revisa la documentación de las tecnologías utilizadas:
-- [Express.js Docs](https://expressjs.com/)
-- [MongoDB Docs](https://docs.mongodb.com/)
-- [Mongoose Docs](https://mongoosejs.com/)
