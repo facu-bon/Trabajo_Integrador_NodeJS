@@ -18,19 +18,27 @@ messagesRouter.get("/",
     )
   }
 );
-messagesRouter.post('/:chatId',
+messagesRouter.post('/:chatId', 
   async (req, res) => {
     try {
       const { chatId } = req.params;
-      const { content, sender} = req.body;
-      if (!content || !sender) {
+      const { content, sender } = req.body;
+      const user = buscarUsuarioPorId(sender);
+      if (!user) {
         return res.status(400).json({
           ok: false,
           status: 400,
-          message: 'Los campos content y sender son obligatorios',
+          message: 'El usuario no existe',
         });
       }
-
+      const chat = buscarChatPorId(chatId);
+      if (!chat) {
+        return res.status(400).json({
+          ok: false,
+          status: 400,
+          message: 'El chat no existe',
+        });
+      }
       const newMessage = await createMessage(content, sender, chatId);
       res.json(
         {
@@ -57,7 +65,7 @@ messagesRouter.put("/:id",
     try {
       const { content } = req.body;
       const { id } = req.params;
-      if (await messageModel.findById (id) === null) {
+      if (await messageModel.findById(id) === null) {
         return res.status(404).json({
           ok: false,
           status: 404,
@@ -90,7 +98,7 @@ messagesRouter.delete("/:id",
   async (req, res) => {
     try {
       const { id } = req.params;
-      if (await messageModel.findById (id) === null) {
+      if (await messageModel.findById(id) === null) {
         return res.status(404).json({
           ok: false,
           status: 404,
