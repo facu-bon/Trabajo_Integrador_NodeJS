@@ -1,6 +1,5 @@
 import express from "express";
-import { createMessage, getMessages, updateMessage, deleteMessage, buscarUsuarioPorId } from "../repository/repository.js";
-import { messageMiddleware } from "../middlewares/messageMiddleware.js";
+import { createMessage, getMessages, updateMessage, deleteMessage } from "../repository/repository.js";
 
 const messagesRouter = express.Router();
 
@@ -19,10 +18,19 @@ messagesRouter.get("/",
     )
   }
 );
-messagesRouter.post('/:chatId', messageMiddleware,
+messagesRouter.post('/:chatId',
   async (req, res) => {
     try {
-      const { content, sender, chatId } = req.body;
+      const { chatId } = req.params;
+      const { content, sender} = req.body;
+      if (!content || !sender) {
+        return res.status(400).json({
+          ok: false,
+          status: 400,
+          message: 'Los campos content y sender son obligatorios',
+        });
+      }
+
       const newMessage = await createMessage(content, sender, chatId);
       res.json(
         {
@@ -44,12 +52,18 @@ messagesRouter.post('/:chatId', messageMiddleware,
     }
   }
 )
-messagesRouter.put("/:id", 
+messagesRouter.put("/:id",
   async (req, res) => {
     try {
       const { content } = req.body;
-      console.log(content);
       const { id } = req.params;
+      if (await messageModel.findById (id) === null) {
+        return res.status(404).json({
+          ok: false,
+          status: 404,
+          message: 'Mensaje no encontrado',
+        });
+      }
       const updatedMessage = await updateMessage(id, content);
       res.json(
         {
@@ -72,30 +86,37 @@ messagesRouter.put("/:id",
     }
   }
 );
-messagesRouter.delete("/:id", 
+messagesRouter.delete("/:id",
   async (req, res) => {
-      try {
-        const { id } = req.params;
-        const deletedMessage = await deleteMessage(id);
-        res.json(
-          {
-            ok: true,
-            status: 200,
-            message: 'Mensaje eliminado correctamente',
-            data: {
-              deletedMessage
-            }
-          }
-        )
-      } catch (error) {
-        res.status(400).json({
+    try {
+      const { id } = req.params;
+      if (await messageModel.findById (id) === null) {
+        return res.status(404).json({
           ok: false,
-          status: 400,
-          message: 'Error al eliminar el mensaje',
-          error: error.message
-        })
+          status: 404,
+          message: 'Mensaje no encontrado',
+        });
       }
+      const deletedMessage = await deleteMessage(id);
+      res.json(
+        {
+          ok: true,
+          status: 200,
+          message: 'Mensaje eliminado correctamente',
+          data: {
+            deletedMessage
+          }
+        }
+      )
+    } catch (error) {
+      res.status(400).json({
+        ok: false,
+        status: 400,
+        message: 'Error al eliminar el mensaje',
+        error: error.message
+      })
     }
+  }
 );
 
 

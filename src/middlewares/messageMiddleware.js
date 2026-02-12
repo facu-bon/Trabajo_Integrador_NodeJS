@@ -1,18 +1,10 @@
 import { buscarUsuarioPorId, buscarChatPorId } from "../repository/repository.js";
 
 
-export function messageMiddleware(req, res, next) {
+function messageMiddleware(req, res, next) {
   try {
-    if (req.method === 'POST' || req.method === 'PUT') {
-    const { content, sender, chatId } = req.body;
+    const { sender, chatId } = req.body;
 
-    if (!content || !sender || !chatId) {
-      return res.status(400).json({
-        ok: false,
-        status: 400,
-        message: 'Los campos content, sender y chatId son obligatorios',
-      });
-    }
     const user = buscarUsuarioPorId(sender);
     if (!user) {
       return res.status(400).json({
@@ -26,13 +18,10 @@ export function messageMiddleware(req, res, next) {
       return res.status(400).json({
         ok: false,
         status: 400,
-        message: 'El Id es obligatorio',
+        message: 'El chat no existe',
       });
     }
     next();
-  } else {
-    next();
-  }
 
   } catch (error) {
     return res.status(500).json({
@@ -43,3 +32,5 @@ export function messageMiddleware(req, res, next) {
     });
   }
 }
+
+export default messageMiddleware;

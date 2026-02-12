@@ -6,7 +6,7 @@ import messagesRouter from "./routes/messages.route.js";
 import authRouter from "./routes/auth.route.js";
 import authorizationMiddleware from "./middlewares/authorizationMiddleware.js";
 import userRouter from "./routes/user.route.js";
-import { messageMiddleware } from "./middlewares/messageMiddleware.js";
+import messageMiddleware from "./middlewares/messageMiddleware.js";
 
 connectDB();
 
@@ -34,8 +34,3 @@ app.get("/test", authorizationMiddleware, (req, res) => {
 app.listen(ENVIRONMENT.PORT, () => console.log("Servidor escuchando en el puerto " + ENVIRONMENT.PORT))
 
 
-
-
-//Endpoint de usuarios
-
-//relacionar mensajes con chats y usuarios
