@@ -100,18 +100,13 @@ https://trabajo-integrador-node-js.vercel.app/api
   {
     "ok": true,
     "status": 200,
-    "data": [
-      {
-        "_id": "507f1f77bcf86cd799439011",
-        "email": "usuario1@example.com",
-        "createdAt": "2024-01-10T10:30:00.000Z"
-      },
-      {
-        "_id": "507f1f77bcf86cd799439012",
-        "email": "usuario2@example.com",
-        "createdAt": "2024-01-12T15:45:00.000Z"
-      }
-    ]
+    "message": "Usuarios obtenidos correctamente",
+    "data": {
+      "users": [
+        { "email": "usuario1@example.com", "id": "507f1f77bcf86cd799439011" },
+        { "email": "usuario2@example.com", "id": "507f1f77bcf86cd799439012" }
+      ]
+    }
   }
   ```
 
@@ -360,9 +355,7 @@ https://trabajo-integrador-node-js.vercel.app/api
     "status": 200,
     "message": "Mensaje eliminado correctamente",
     "data": {
-      "deletedMessage": {
-        "_id": "507f1f77bcf86cd799439032"
-      }
+      "deletedMessage": "Mensaje eliminado"
     }
   }
   ```
