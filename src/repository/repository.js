@@ -18,6 +18,9 @@ export async function createMessage(content, sender, chatId) {
 export async function getMessages() {
   try {
     const messages = await messageModel.find();
+    if (!messages || messages.length === 0) {
+      return "No hay mensajes registrados";
+    }
     return messages;
   } catch (error) {
     console.log("Error al obtener los mensajes", error);
