@@ -3,6 +3,7 @@ import { buscarUsuarioPorId, buscarChatPorId } from "../repository/repository.js
 
 export function messageMiddleware(req, res, next) {
   try {
+    if (req.method === 'POST' || req.method === 'PUT') {
     const { content, sender, chatId } = req.body;
 
     if (!content || !sender || !chatId) {
@@ -29,6 +30,9 @@ export function messageMiddleware(req, res, next) {
       });
     }
     next();
+  } else {
+    next();
+  }
 
   } catch (error) {
     return res.status(500).json({
