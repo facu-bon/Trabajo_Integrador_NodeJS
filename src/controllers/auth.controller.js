@@ -1,5 +1,5 @@
 import ENVIRONMENT from "../config/environment.js";
-import { buscarUsuarioPorEmail} from "../repository/repository.js";
+import { buscarUsuarioPorEmail, createUser} from "../repository/repository.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
