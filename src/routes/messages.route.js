@@ -1,5 +1,5 @@
 import express from "express";
-import { createMessage, getMessages, updateMessage, deleteMessage } from "../repository/repository.js";
+import { createMessage, getMessages, updateMessage, deleteMessage, buscarUsuarioPorId, buscarChatPorId } from "../repository/repository.js";
 
 const messagesRouter = express.Router();
 
